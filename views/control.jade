@@ -1,0 +1,11 @@
+extends layout
+
+block content
+    h1 Venmo Charge a Customer
+    form#formAddUser(name="addpayment",method="post",action="/addpayment")
+        input#inputUserName(type="text", placeholder="name", name="name")
+        input#inputUserEmail(type="tel", placeholder="telephone", name="telephone")
+        input#inputUserAmt(type="text", placeholder="amount", name="amount")
+        button#btnSubmit(type="submit") submit
+    h1 Real-Time Counter
+    h1#available 30
