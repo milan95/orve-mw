@@ -1,0 +1,64 @@
+extends layout
+
+block content
+	h1 Show Dates
+	h4 Enable and disable sales for a show by unchecking the show's checkbox and then pressing the "Update" button.
+	form#formAdminPanel(name="updateshows",method="post",action="/updateshows")
+		p
+			input(type='checkbox', name='disabled1015800', value='disabled1015800', checked=disabled1015800)
+			&nbspWednesday, October 15, 8PM
+			br
+			&nbspTickets Available: 
+			input(type='number', placeholder='250', name='num1015800', value=tix1015800)
+			br
+			&nbspShow has sold #{sold1015800} tickets.
+		p
+			input(type='checkbox', name='disabled1016730', value='disabled1016730', checked=disabled1016730)
+			&nbsp;Thursday, October 16, 7:30PM
+			br
+			&nbspTickets Available: 
+			input(type='number', placeholder='250', name='num1016730', value=tix1016730)
+			br
+			&nbspShow has sold #{sold1016730} tickets.
+		p
+			input(type='checkbox', name='disabled1016900', value='disabled1016900', checked=disabled1016900)
+			&nbsp;Thursday, October 16, 9:00PM
+			br
+			&nbspTickets Available: 
+			input(type='number', placeholder='250', name='num1016900', value=tix1016900)
+			br
+			&nbspShow has sold #{sold1016900} tickets.
+		p
+			input(type='checkbox', name='disabled1017730', value='disabled1017730', checked=disabled1017730)
+			&nbsp;Friday, October 17, 7:30PM
+			br
+			&nbspTickets Available: 
+			input(type='number', placeholder='250', name='num1017730', value=tix1017730)
+			br
+			&nbspShow has sold #{sold1017730} tickets.
+		p
+			input(type='checkbox', name='disabled1017900', value='disabled1017900', checked=disabled1017900)
+			&nbsp;Friday, October 17, 9:00PM
+			br
+			&nbspTickets Available: 
+			input(type='number', placeholder='250', name='num1017900', value=tix1017900)
+			br
+			&nbspShow has sold #{sold1017900} tickets.
+		p
+			input(type='checkbox', name='disabled1018730', value='disabled1018730', checked=disabled1018730)
+			&nbsp;Saturday, October 18, 7:30PM
+			br
+			&nbspTickets Available: 
+			input(type='number', placeholder='250', name='num1018730', value=tix1018730)
+			br
+			&nbspShow has sold #{sold1018730} tickets.
+		p
+			input(type='checkbox', name='disabled1018900', value='disabled1018900', checked=disabled1018900)
+			&nbsp;Saturday, October 18, 9:00PM
+			br
+			&nbspTickets Available: 
+			input(type='number', placeholder='250', name='num1018900', value=tix1018900)
+			br
+			&nbspShow has sold #{sold1018900} tickets.
+		p
+			button#btnSubmit(type="submit") Update
