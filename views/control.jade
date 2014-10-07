@@ -1,11 +1,30 @@
 extends layout
 
 block content
-    h1 Venmo Charge a Customer
-    form#formAddUser(name="addpayment",method="post",action="/addpayment")
-        input#inputUserName(type="text", placeholder="name", name="name")
-        input#inputUserEmail(type="tel", placeholder="telephone", name="telephone")
-        input#inputUserAmt(type="text", placeholder="amount", name="amount")
-        button#btnSubmit(type="submit") submit
-    h1 Real-Time Counter
-    h1#available 30
+	h1 Venmo Sales
+	p#responseMessage #{formResult}
+	form#formVenmoCharge(name="chargecustomer",method="post",action="/chargecustomer")
+		input#inputUserFirstName(type="text", placeholder="First Name", name="firstname")
+		input#inputUserLastName(type="text", placeholder="Last Name", name="lastname")
+		input#inputUserPhone(type="tel", placeholder="(123) 456-789", name="telephone")
+		select#selectAmount(name='amount')
+			option(value='', disabled=true, selected=true) Select an amount
+				option(value='10.00') $10
+				option(value='12.00') $12
+				option(value='15.00') $15
+		select#selectShow(name='show')
+			option(value='', disabled=true, selected=true) Select a show
+			option(value='10_15-8PM', disabled=disabled10158) Wednesday 8:00PM
+			option(value='10_16-730PM', disabled=disabled1016730) Thursday 7:30PM
+			option(value='10_16-9PM', disabled=disabled10169) Thursday 9:00PM
+			option(value='10_17-730PM', disabled=disabled1017730) Friday 7:30PM
+			option(value='10_17-9PM', disabled=disabled10179) Thursday 9:00PM
+			option(value='10_18-730PM', disabled=disabled1018730) Saturday 7:30PM
+			option(value='10_18-9PM', disabled=disabled10189) Saturday 9:00PM
+		button#btnSubmit(type="submit") Send Charge
+	h1 Cash Sales
+	form#formAddUser(name="chargecustomer",method="post",action="/chargecustomer")
+		select#selectShow(name='show')
+			option(value='', disabled=true, selected=true) Select a show
+			
+		button#btnSubmit(type="submit") Cash Sale

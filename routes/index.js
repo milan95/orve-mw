@@ -1,84 +1,75 @@
 var express = require('express');
 var router = express.Router();
-
-//
-var querystring = require('querystring');
-// var http = require('https');
-// http.post = require('http-post');
-var fs = require('fs');
-//
 var request = require('request');
+var fs = require('fs');
+
+var ACCESS_TOKEN = 'ubrRcUkNB93YS5y7UByZ4WjWAq7HzuGj'
+
+router.get('/', function(req, res) {
+  res.render('index', { title: 'Orve Home' });
+});
 
 /* GET home page. */
 router.get('/', function(req, res) {
-  res.render('index', { title: 'Express' });
-});
-
-/* GET Hello World page. */
-router.get('/helloworld', function(req, res) {
-    res.render('helloworld', { title: 'Hello, World!' })
+  res.render('index', { title: 'Orve Home' });
 });
 
 /* GET Hello World page. */
 router.get('/control', function(req, res) {
-    res.render('control', { title: 'Control!' });
+    // DO DATABASE CHECK FOR SHOW ENABLED/DISABLED
+    res.render('control', { title: 'Ticketing Control Panel',
+                            disabled10158: false,
+                            disabled1016730: false,
+                            disabled10169: false,
+                            disabled1017730: false,
+                            disabled10179: false,
+                            disabled1018730: false,
+                            disabled10189: false });
+    db.usercollection.drop();
 });
 
-/* GET Userlist page. */
-router.get('/userlist', function(req, res) {
-    var db = req.db;
-    var collection = db.get('usercollection');
+/* POST to Charge Customer Service */
+router.post('/chargecustomer', function(req, res) {
 
-    collection.find({},{},function(e,docs){
-        res.render('userlist', {
-            "userlist" : docs
-        });
-    });
-});
-
-/* GET New User page. */
-router.get('/newuser', function(req, res) {
-    res.render('newuser', { title: 'Add New User' });
-});
-
-/* POST to Add User Service */
-router.post('/addpayment', function(req, res) {
-     res.render('helloworld', { title: 'Hello' });
     // Set our internal DB variable
     var db = req.db;
 
     // Get our form values. These rely on the "name" attributes
-    var userName = req.body.name;
+    var userFirstName = req.body.firstname;
+    var userLastName = req.body.lastname;
+    var userName = userFirstName + userLastName;
     var userPhone = req.body.telephone;
     var userAmt = req.body.amount;
+    var userShow = req.body.show;
 
     var newAmt = "-" + userAmt;
+    var message = "Mask%20and%20Wig%20" + userShow + "Show";
+    var formResponse = "Venmo Charge for " + userName + " at phone number " + userPhone + " for show " + userShow + " for $" + userAmt + " was successful.";
+
+    res.render('control', { title: 'Ticketing Control Panel', formResult: formResponse });
 
     // Set our collection
     var collection = db.get('usercollection');
 
-    var message = "Chamber_Orchestra_Concert_Tickets";
 
-    var TXN = PostChargeRequest("YqNFqWY4q9v5neJ82euPbdFSNtCQ28n4", userPhone, newAmt, message);
+
+    //var TXN = PostChargeRequest(ACCESS_TOKEN, userPhone, newAmt, message);
 
     // Submit to the DB
     collection.insert({
         "name" : userName,
         "phone" : userPhone,
         "amount" : userAmt,
-        "transID" : TXN,
+        //"transID" : TXN,
         "status" : "pending",
-        "showDate" : "2014-09-30T04:31:22-05:00"
+        "showDate" : userShow
     }, function (err, doc) {
         if (err) {
             // If it failed, return error
-            res.send("There was a problem adding the information to the database.");
+            //res.send("There was a problem processing the charge request.");
         }
         else {
-            // If it worked, set the header so the address bar doesn't still say /adduser
-            //res.location("userlist");
-            // And forward to success page
-            //res.redirect("userlist");
+            //document.getElementById("responseMessage").innerHTML = "New text!";
         }
     });
 
