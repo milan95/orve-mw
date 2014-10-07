@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var gCollection;
 
 //
 var querystring = require('querystring');
@@ -23,10 +22,6 @@ router.get('/helloworld', function(req, res) {
 /* GET Hello World page. */
 router.get('/control', function(req, res) {
     res.render('control', { title: 'Control!' });
-    var db = req.db;
-    gCollection = db.get('usercollection');
-    setInterval(function(){checkChargeCompletion("YqNFqWY4q9v5neJ82euPbdFSNtCQ28n4")},10*1000);
-    //checkChargeCompletion("YqNFqWY4q9v5neJ82euPbdFSNtCQ28n4", collection);
 });
 
 /* GET Userlist page. */
@@ -113,43 +108,5 @@ function PostChargeRequest(accessToken, userPhone, amount, note) {
   form.append('note', note);
 }
 
-function checkChargeCompletion(accessToken) {
-  console.log(gCollection);
-  //we get a collection of all the pending transactions
-  var pending = gCollection.find({"status" : "pending"});
-  console.log(pending);
-  //iterate through the transactions
-  for (var i = 0, len = pending.length; i < len; ++i){
-    console.log('some pending. checking');
-    var transactionID = pending[i].transID; //NB: we may need to change this name depending what database calls it
-    //process that transaction
-    var transURL = 'https://api.venmo.com/v1/payments/' + transactionID;
-    console.log('check log:', transURL)
-    //actually perform the request
-    var r = request.get(transURL, function(err, httpResponse, body) {
-      //console.log("made it into the request");
-      var transactionDetails = JSON.parse(body); //should be a list of Payment objects, we'll extract ids from them
-      console.log(transactionDetails);
-      
-      //we could also in the future when we cover multiple performances include information
-      //about itemization so that we can decrement ticket counter of the right performance
-      
-      //it should look something like this
-      var transactionIDs = [];
-      var transactionStatuses = [];
-      // transactionIDs[i] = transactionsDetails[i].data[7]; //stored in json in weird way 
-      transactionStatus = transactionsDetails.data.status; //only checks one status
-      //if this transaction is settled according to venmo but not our database, update the database
-      if((gCollection.count({ "transID" : transactionID}, {"status" : "settled"}) == 0) && (transactionStatus == "settled")) { //it has to be settled too
-        gCollection.insert({ "transID" : transactionID}, {"status" : "settled"}); //also add other info like which showing it was once we have that
-        console.log('it worked');
-      }
-    });
-    var form = r.form();
-    form.append('access_token', accessToken);
-  }
-}
-
-// setInterval(checkChargeCompletion("YqNFqWY4q9v5neJ82euPbdFSNtCQ28n4", collectionGlobal),30*1000);
 
 module.exports = router;
