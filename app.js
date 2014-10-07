@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongo = require('mongodb');
 var monk = require('monk');
-var db = monk('localhost:27017/orve-mw');
+var db = monk('heroku:d2a6eb1f9477fe8682a250badb2d94bd@linus.mongohq.com:10053/app30474414');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
