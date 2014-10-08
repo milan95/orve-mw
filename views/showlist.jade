@@ -6,4 +6,10 @@ block content
 	ul
 		each show, i in showlist
 			li
-				#{show.date} . Hidden: #{show.acceptingTickets} Number of Tickets: #{show.tixAvail} Tickets Sold: #{show.tixSold}
+				#{show.date}
+				br 
+				| Hidden: #{show.acceptingTickets} 
+				br
+				| Number of Tickets: #{show.tixAvail}
+				br
+				| Tickets Sold: #{show.tixSold}
