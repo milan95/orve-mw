@@ -1,0 +1,32 @@
+extends layout
+
+block content
+	script(src='//code.jquery.com/jquery-1.10.2.js')
+	script(src='//code.jquery.com/ui/1.11.1/jquery-ui.js')
+	script
+		$(function() {
+		$( "#datepicker" ).datepicker({dateFormat: 'yy-mm-dd'});
+		});
+	h1 Add a Show
+	h4 To add a show, pick the show's date, the show's time, whether you want tickets to be available (uncheck to make available immediately) and an initial number of available tickets.
+	h4 Note: If you add a show here that already exists, all previous counted sales for a show will be deleted.
+	p#responseMessage #{formResult}
+	form#formAddShow(name="showcreate",method="post",action="/showcreate")
+		p
+			| Hidden from Sellers:
+			input(type='checkbox', name='showUnavailable', checked="on")
+			br
+			| Tickets Available: 
+			input(type='number', placeholder='250', name='ticketNumber')
+			br
+			| Show Time:
+			select(name='showTime')
+				option(value='', disabled=true, selected=true) Select a showtime
+				option(value='19:30:00-05:00') 7:30PM
+				option(value='20:00:00-05:00') 8:00PM
+				option(value='21:00:00-05:00') 9:00PM
+			br
+			| Show Date: 
+			input#datepicker(type='text', name='showDate')
+
+			button#btnSubmit(type="submit") Add Show

@@ -11,167 +11,152 @@ router.get('/', function(req, res) {
 });
 
 /* GET Userlist page. */
-router.get('/userlist', function(req, res) {
+router.get('/showlist', function(req, res) {
     var db = req.db;
-    var collection = db.get('usercollection');
+    var collection = db.get('shows');
     collection.find({},{},function(e,docs){
-        res.render('userlist', {
-            "userlist" : docs
+        res.render('showlist', {
+            "showlist" : docs
         });
     });
+});
+
+/* GET addshow page */
+router.get('/addshow', function(req, res) { 
+    res.render('addshow', { title: 'Add a Show' });
+    // Add show
+});
+
+/* POST to Add Shows Service */
+router.post('/showcreate', function(req, res) {
+  var db = req.db;
+  var collection = db.get('shows');
+
+  var showDateTime = req.body.showDate + 'T' + req.body.showTime;
+
+  collection.update(
+    { date: showDateTime },
+    {
+      $set: {
+        acceptingTickets: req.body.showUnavailable,
+        tixAvail: req.body.ticketNumber,
+        tixSold: 0
+      }
+    },
+    {
+      upsert: true
+    }
+  );
+
+  var formResponse = "Show created successfully."
+  res.render('addshow', { title: 'Add a Show', formResult: formResponse });
 });
 
 /* GET admin page */
 router.get('/admin', function(req, res) {
     // DO DATABASE CHECK FOR SHOW ENABLED/DISABLED
-    res.render('admin', { title: 'Administrator Control Panel',
-                          tix1015800: 10,
-                          tix1016730: 20,
-                          tix1016900: 30,
-                          tix1017730: 40,
-                          tix1017900: 50,
-                          tix1018730: 60,
-                          tix1018900: 70,
-                          sold1015800: 1,
-                          sold1016730: 2,
-                          sold1016900: 3,
-                          sold1017730: 4,
-                          sold1017900: 5,
-                          sold1018730: 6,
-                          sold1018900: 7,
-                          disabled1015800: false,
-                          disabled1016730: false,
-                          disabled1016900: false,
-                          disabled1017730: false,
-                          disabled1017900: false,
-                          disabled1018730: false,
-                          disabled1018900: false });
+
+    var db = req.db;
+    var collection = db.get('shows');
+    collection.find({},{},function(e,docs){
+        res.render('admin', {
+            "showEntries" : docs
+        });
+    });
     
 });
 
 /* GET seller page page. */
 router.get('/seller', function(req, res) {
-    // DO DATABASE CHECK FOR SHOW ENABLED/DISABLED
-    res.render('seller', { title: 'Ticketing Control Panel',
-                            disabled1015800: false,
-                            disabled1016730: false,
-                            disabled1016900: false,
-                            disabled1017730: false,
-                            disabled1017900: false,
-                            disabled1018730: false,
-                            disabled1018900: false });
+    var db = req.db;
+    var collection = db.get('shows');
+    var avail1015800;
+    var avail1016730;
+    var avail1016900;
+    var avail1017730;
+    var avail1017900;
+    var avail1018730;
+    var avail1018900;
+
+    collection.findOne({ date: "10_15-800PM" }, function(err, doc) {
+          if (err) throw err
+          avail1015800 = doc.acceptingTickets
+
+          collection.findOne({ date: "10_16-730PM" }, function(err, doc) {
+            if (err) throw err
+            avail1016730 = doc.acceptingTickets
+            
+            collection.findOne({ date: "10_16-900PM" }, function(err, doc) {
+              if (err) throw err
+              avail1016900 = doc.acceptingTickets
+              
+
+
+            });
+
+          });
+
+        });
+
+    collection.findOne({ date: "10_17-730PM" }, function(err, doc) {
+          if (err) throw err
+          avail1017730 = doc.acceptingTickets
+          console.log(avail1017730)
+        });
+
+    collection.findOne({ date: "10_17-900PM" }, function(err, doc) {
+          if (err) throw err
+          avail1017900 = doc.acceptingTickets
+          console.log(avail1017900)
+        });
+
+    collection.findOne({ date: "10_18-730PM" }, function(err, doc) {
+          if (err) throw err
+          avail1018730 = doc.acceptingTickets
+          console.log(avail1018730)
+        });
+
+    collection.findOne({ date: "10_18-900PM" }, function(err, doc) {
+          if (err) throw err
+          avail1018900 = doc.acceptingTickets
+          console.log(avail1018900)
+          res.render('seller', { title: 'Ticketing Control Panel',
+                        disabled1015800: avail1015800,
+                        disabled1016730: avail1016730,
+                        disabled1016900: avail1016900,
+                        disabled1017730: avail1017730,
+                        disabled1017900: avail1017900,
+                        disabled1018730: avail1018730,
+                        disabled1018900: avail1018900 })
+        });
 });
 
 /* POST to Update Shows Service */
 router.post('/updateshows', function(req, res) {
   var db = req.db;
+  var collection = db.get('shows');
 
-  var show1015800 = req.body.disabled1015800;
-  var show1016730 = req.body.disabled1016730;
-  var show1016900 = req.body.disabled1016900;
-  var show1017730 = req.body.disabled1017730;
-  var show1017900 = req.body.disabled1017900;
-  var show1018730 = req.body.disabled1018730;
-  var show1018900 = req.body.disabled1018900;
+  var formResponse = "Update submitted successfully."
+  res.render('admin', { title: 'Ticketing Control Panel', formResult: formResponse });
 
-  var avail1015800 = req.body.num1015800;
-  var avail1016730 = req.body.num1016730;
-  var avail1016900 = req.body.num1016900;
-  var avail1017730 = req.body.num1017730;
-  var avail1017900 = req.body.num1017900;
-  var avail1018730 = req.body.num1018730;
-  var avail1018900 = req.body.num1018900;
+  // for()
+  // {
 
-  db.shows.update(
-    { date: "10_15-800PM" },
-    {
-      $set: {
-        acceptingTickets: show1015800,
-        tixAvail: avail1015800
-      }
-    },
-    {
-      upsert: true
-    }
-  );
+  // }
+  
+  // collection.update(
+  //   { date: "10_15-800PM" },
+  //   {
+  //     $set: {
+  //       acceptingTickets: show1015800,
+  //       tixAvail: avail1015800
+  //     }
+  //   },
+  //   {
+  //     upsert: true
+  //   }
+  // );
 
-  db.shows.update(
-    { date: "10_16-730PM" },
-    {
-      $set: {
-        acceptingTickets: show1016730,
-        tixAvail: avail1016730
-      }
-    },
-    {
-      upsert: true
-    }
-  );
-
-  db.shows.update(
-    { date: "10_16-900PM" },
-    {
-      $set: {
-        acceptingTickets: show1016900,
-        tixAvail: avail1016900
-      }
-    },
-    {
-      upsert: true
-    }
-  );
-
-  db.shows.update(
-    { date: "10_17-730PM" },
-    {
-      $set: {
-        acceptingTickets: show1017730,
-        tixAvail: avail101730
-      }
-    },
-    {
-      upsert: true
-    }
-  );
-
-  db.shows.update(
-    { date: "10_17-900PM" },
-    {
-      $set: {
-        acceptingTickets: show1017900,
-        tixAvail: avail1017900
-      }
-    },
-    {
-      upsert: true
-    }
-  );
-
-  db.shows.update(
-    { date: "10_18-730PM" },
-    {
-      $set: {
-        acceptingTickets: show1018730,
-        tixAvail: avail1018730
-      }
-    },
-    {
-      upsert: true
-    }
-  );
-
-  db.shows.update(
-    { date: "10_18-900PM" },
-    {
-      $set: {
-        acceptingTickets: show1018900,
-        tixAvail: avail1018900
-      }
-    },
-    {
-      upsert: true
-    }
-  );
 });
 
 /* POST to Charge Customer Service */

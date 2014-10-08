@@ -1,0 +1,9 @@
+extends layout
+
+block content
+	h1.
+		Show List
+	ul
+		each show, i in showlist
+			li
+				#{show.date} . Hidden: #{show.acceptingTickets} Number of Tickets: #{show.tixAvail} Tickets Sold: #{show.tixSold}
