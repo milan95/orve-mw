@@ -15,9 +15,9 @@ router.get('/showlist', function(req, res) {
     var db = req.db;
     var collection = db.get('shows');
     collection.find({},{},function(e,docs){
-        res.render('showlist', {
-            "showlist" : docs
-        });
+      res.render('showlist', {
+          "showlist" : docs
+      });
     });
 });
 
@@ -54,7 +54,6 @@ router.post('/showcreate', function(req, res) {
 
 /* GET admin page */
 router.get('/admin', function(req, res) {
-    // DO DATABASE CHECK FOR SHOW ENABLED/DISABLED
 
     var db = req.db;
     var collection = db.get('shows');
@@ -89,9 +88,6 @@ router.get('/seller', function(req, res) {
             collection.findOne({ date: "10_16-900PM" }, function(err, doc) {
               if (err) throw err
               avail1016900 = doc.acceptingTickets
-              
-
-
             });
 
           });
@@ -136,22 +132,32 @@ router.post('/updateshows', function(req, res) {
   var db = req.db;
   var collection = db.get('shows');
 
-  var formResponse = "Update submitted successfully."
-  res.render('admin', { title: 'Ticketing Control Panel', formResult: formResponse });
+  var acceptingName;
+  var availableNum
 
+  collection.find({}, function(err, cursor) {
+    for(i = 0; i < cursor.length; i++){
 
-  // collection.update(
-  //   { date: "10_15-800PM" },
-  //   {
-  //     $set: {
-  //       acceptingTickets: show1015800,
-  //       tixAvail: avail1015800
-  //     }
-  //   },
-  //   {
-  //     upsert: true
-  //   }
-  // );
+      acceptingName = 'acceptingTickets-' + cursor[i].date;
+      availableNum = 'tixAvail-' + cursor[i].date;
+
+      collection.update(
+        { date: cursor[i].date },
+        {
+          $set: {
+            acceptingTickets: req.body[acceptingName],
+            tixAvail: req.body[availableNum]
+          }
+        },
+        {
+          upsert: true
+        }
+      );
+    }
+  });
+
+  var formResponse = "Update submitted successfully.";
+  res.redirect('admin');
 
 });
 
