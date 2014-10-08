@@ -14,23 +14,13 @@ block content
 			option(value='15.00') $15
 		select#selectShow(name='show')
 			option(value='', disabled=true, selected=true) Select a show
-			option(value='10_15-800PM', disabled=disabled1015800) Wednesday 8:00PM
-			option(value='10_16-730PM', disabled=disabled1016730) Thursday 7:30PM
-			option(value='10_16-900PM', disabled=disabled1016900) Thursday 9:00PM
-			option(value='10_17-730PM', disabled=disabled1017730) Friday 7:30PM
-			option(value='10_17-900PM', disabled=disabled1017900) Thursday 9:00PM
-			option(value='10_18-730PM', disabled=disabled1018730) Saturday 7:30PM
-			option(value='10_18-900PM', disabled=disabled1018900) Saturday 9:00PM
+				each show, i in showEntries
+					option(value=show.date, disabled=show.acceptingTickets) #{show.date}
 		button#btnSubmit(type="submit") Send Charge
 	h1 Cash Sales
 	form#formAddUser(name="chargecustomer",method="post",action="/chargecustomer")
 		select#selectShow(name='show')
 			option(value='', disabled=true, selected=true) Select a show
-			option(value='10_15-800PM', disabled=disabled1015800) Wednesday 8:00PM
-			option(value='10_16-730PM', disabled=disabled1016730) Thursday 7:30PM
-			option(value='10_16-900PM', disabled=disabled1016900) Thursday 9:00PM
-			option(value='10_17-730PM', disabled=disabled1017730) Friday 7:30PM
-			option(value='10_17-900PM', disabled=disabled1017900) Thursday 9:00PM
-			option(value='10_18-730PM', disabled=disabled1018730) Saturday 7:30PM
-			option(value='10_18-900PM', disabled=disabled1018900) Saturday 9:00PM
+			each show, i in showEntries
+					option(value=show.date, disabled=show.acceptingTickets) #{show.date}
 		button#btnSubmit(type="submit") Cash Sale

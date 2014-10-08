@@ -69,62 +69,12 @@ router.get('/admin', function(req, res) {
 router.get('/seller', function(req, res) {
     var db = req.db;
     var collection = db.get('shows');
-    var avail1015800;
-    var avail1016730;
-    var avail1016900;
-    var avail1017730;
-    var avail1017900;
-    var avail1018730;
-    var avail1018900;
 
-    collection.findOne({ date: "10_15-800PM" }, function(err, doc) {
-          if (err) throw err
-          avail1015800 = doc.acceptingTickets
-
-          collection.findOne({ date: "10_16-730PM" }, function(err, doc) {
-            if (err) throw err
-            avail1016730 = doc.acceptingTickets
-            
-            collection.findOne({ date: "10_16-900PM" }, function(err, doc) {
-              if (err) throw err
-              avail1016900 = doc.acceptingTickets
-            });
-
-          });
-
+    collection.find({},{},function(e,docs){
+        res.render('seller', {
+            "showEntries" : docs
         });
-
-    collection.findOne({ date: "10_17-730PM" }, function(err, doc) {
-          if (err) throw err
-          avail1017730 = doc.acceptingTickets
-          console.log(avail1017730)
-        });
-
-    collection.findOne({ date: "10_17-900PM" }, function(err, doc) {
-          if (err) throw err
-          avail1017900 = doc.acceptingTickets
-          console.log(avail1017900)
-        });
-
-    collection.findOne({ date: "10_18-730PM" }, function(err, doc) {
-          if (err) throw err
-          avail1018730 = doc.acceptingTickets
-          console.log(avail1018730)
-        });
-
-    collection.findOne({ date: "10_18-900PM" }, function(err, doc) {
-          if (err) throw err
-          avail1018900 = doc.acceptingTickets
-          console.log(avail1018900)
-          res.render('seller', { title: 'Ticketing Control Panel',
-                        disabled1015800: avail1015800,
-                        disabled1016730: avail1016730,
-                        disabled1016900: avail1016900,
-                        disabled1017730: avail1017730,
-                        disabled1017900: avail1017900,
-                        disabled1018730: avail1018730,
-                        disabled1018900: avail1018900 })
-        });
+    });
 });
 
 /* POST to Update Shows Service */
