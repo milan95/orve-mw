@@ -139,11 +139,7 @@ router.post('/updateshows', function(req, res) {
   var formResponse = "Update submitted successfully."
   res.render('admin', { title: 'Ticketing Control Panel', formResult: formResponse });
 
-  // for()
-  // {
 
-  // }
-  
   // collection.update(
   //   { date: "10_15-800PM" },
   //   {
