@@ -12,24 +12,33 @@ router.get('/', function(req, res) {
 
 /* GET Show list page. */
 router.get('/showlist', function(req, res) {
-    var db = req.db;
-    var collection = db.get('shows');
-    collection.find({},{},function(e,docs){
-      res.render('showlist', {
-          "showlist" : docs
-      });
+  var db = req.db;
+  var collection = db.get('shows');
+  collection.find({},{},function(e,docs){
+    res.render('showlist', {
+        "showlist" : docs
     });
+  });
 });
 
 /* GET Ticket list page. */
 router.get('/ticketlist', function(req, res) {
-    var db = req.db;
-    var collection = db.get('tickets');
-    collection.find({},{},function(e,docs){
-      res.render('ticketlist', {
-          "ticketlist" : docs
-      });
+  var db = req.db;
+  var collection = db.get('tickets');
+  collection.find({},{},function(e,docs){
+    res.render('ticketlist', {
+        "ticketlist" : docs
     });
+  });
+});
+
+router.get('/venmo_update', function(req, res) {
+  var db = req.db;
+  var collection = db.get('tickets');
+
+  var venmoChallenge = req.query.venmo_challenge;
+
+  res.render('venmo_update', { venmo_challenge : venmoChallenge });
 });
 
 /* GET addshow page */
@@ -65,29 +74,28 @@ router.post('/showcreate', function(req, res) {
 
 /* GET admin page */
 router.get('/admin', function(req, res) {
-
-    var db = req.db;
-    var collection = db.get('shows');
-    collection.find({},{},function(e,docs){
-        res.render('admin', {
-            "showEntries" : docs,
-            title: 'Administrator Control Panel'
-        });
-    });
+  var db = req.db;
+  var collection = db.get('shows');
+  collection.find({},{},function(e,docs){
+      res.render('admin', {
+          "showEntries" : docs,
+          title: 'Administrator Control Panel'
+      });
+  });
     
 });
 
 /* GET seller page page. */
 router.get('/seller', function(req, res) {
-    var db = req.db;
-    var collection = db.get('shows');
+  var db = req.db;
+  var collection = db.get('shows');
 
-    collection.find({},{},function(e,docs){
-        res.render('seller', {
-            "showEntries" : docs,
-            title: 'Sell Tickets'
-        });
-    });
+  collection.find({},{},function(e,docs){
+      res.render('seller', {
+          "showEntries" : docs,
+          title: 'Sell Tickets'
+      });
+  });
 });
 
 /* POST to Update Shows Service */
@@ -124,24 +132,13 @@ router.post('/updateshows', function(req, res) {
 
 });
 
-/* POST to Charge Customer Service */
-router.post('/chargecustomer', function(req, res) {
+router.post('/cashsale', function(req, res) {
+  
+  var db = req.db;
+  var sellerCollection = db.get('shows');
+  var userShow = req.body.show;
 
-    // Set our internal DB variable
-    var db = req.db;
-    var sellerCollection = db.get('shows');
-
-    // Get our form values. These rely on the "name" attributes
-    var userFirstName = req.body.firstname;
-    var userLastName = req.body.lastname;
-    var userPhone = req.body.telephone;
-    var userAmt = req.body.amount;
-    var userShow = req.body.show;
-
-    var newAmt = "-" + userAmt;
-    var prettyShow = new Date(userShow).toLocaleString();
-    var message = "Mask and Wig " + prettyShow + " Show";
-    var formResponse = "Venmo Charge for " + userFirstName + " " + userLastName + " at phone number " + userPhone + " for show " + prettyShow + " for $" + userAmt + " was successful.";
+  var formResponse = "Cash sale submitted.";
 
     sellerCollection.find({},{},function(e,docs){
         res.render('seller', {
@@ -150,41 +147,71 @@ router.post('/chargecustomer', function(req, res) {
         });
     });
 
-    // Set our collection
-    var collection = db.get('tickets');
-
-    //var TXN = PostChargeRequest(ACCESS_TOKEN, userPhone, newAmt, message);
-
-    // Submit to the DB
-    collection.insert({
-        "firstname" : userFirstName,
-        "lastname": userLastName,
-        "phone" : userPhone,
-        "amount" : userAmt,
-        //"transID" : TXN,
-        "status" : "pending",
-        "showDate" : userShow
-    }, function (err, doc) {
-        if (err) {
-        }
-        else {
-        }
-    });
-
-// FIX THIS STUFF!!!
-    var currentTickets = parseInt(sellerCollection.tixSold) + 1;
+  sellerCollection.find({ date: userShow }, function(e,doc){
+    var ticketNumber;
+    ticketNumber = doc[0].tixSold + 1;
 
     sellerCollection.update(
       { date: userShow },
       {
         $set: {
-          tixSold: currentTickets
+          tixSold: ticketNumber
         }
       },
       {
         upsert: true
       }
     );
+  });
+
+});
+
+/* POST to Charge Customer Service */
+router.post('/chargecustomer', function(req, res) {
+
+  // Set our internal DB variable
+  var db = req.db;
+  var sellerCollection = db.get('shows');
+
+  // Get our form values. These rely on the "name" attributes
+  var userFirstName = req.body.firstname;
+  var userLastName = req.body.lastname;
+  var userPhone = req.body.telephone;
+  var userAmt = req.body.amount;
+  var userShow = req.body.show;
+
+  var newAmt = "-" + userAmt;
+  var prettyShow = new Date(userShow).toLocaleString();
+  var message = "Mask and Wig " + prettyShow + " Show";
+  var formResponse = "Venmo Charge for " + userFirstName + " " + userLastName + " at phone number " + userPhone + " for show " + prettyShow + " for $" + userAmt + " was successful.";
+
+  sellerCollection.find({},{},function(e,docs){
+      res.render('seller', {
+          "showEntries" : docs,
+          formResult: formResponse
+      });
+  });
+
+  // Set our collection
+  var collection = db.get('tickets');
+
+  //var TXN = PostChargeRequest(ACCESS_TOKEN, userPhone, newAmt, message);
+
+  // Submit to the DB
+  collection.insert({
+      "firstname" : userFirstName,
+      "lastname": userLastName,
+      "phone" : userPhone,
+      "amount" : userAmt,
+      //"transID" : TXN,
+      "status" : "pending",
+      "showDate" : userShow
+  }, function (err, doc) {
+      if (err) {
+      }
+      else {
+      }
+  });
 
 });
 

@@ -22,7 +22,7 @@ block content
 					option(value=show.date, disabled=show.acceptingTickets) #{dateFormatter(show.date)}
 		button#btnSubmit(type="submit") Send Charge
 	h1 Cash Sales
-	form#formAddUser(name="chargecustomer",method="post",action="/chargecustomer")
+	form#formAddUser(name="cashsale",method="post",action="/cashsale")
 		select#selectShow(name='show')
 			option(value='', disabled=true, selected=true) Select a show
 				each show, i in showEntries
