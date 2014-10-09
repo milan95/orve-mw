@@ -41,7 +41,7 @@ router.post('/venmo_update', function(req, res) {
 
   var venmoResponse = JSON.parse(req);
 
-  res.render('venmo_update', { });
+  res.writeHead(200, {'Content-Type': 'text/plain'});
 
   if(venmoResponse.type == "payment.updated") {
 
