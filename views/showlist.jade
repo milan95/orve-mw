@@ -4,9 +4,13 @@ block content
 	h1.
 		Show List
 	ul
+		- var dateFormatter = function(showDate){
+		-	var returnDate = new Date(showDate).toLocaleString();
+		-	return returnDate;
+		- }
 		each show, i in showlist
 			li
-				#{show.date}
+				| #{dateFormatter(show.date)}
 				br 
 				| Hidden: #{show.acceptingTickets} 
 				br

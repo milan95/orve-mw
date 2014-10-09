@@ -5,9 +5,13 @@ block content
 	h4 To allow sellers to sell tickets, uncheck the "Hidden" box.
 	p#responseMessage #{formResult}
 	form#formAdminPanel(name="updateshows",method="post",action="/updateshows")
+		- var dateFormatter = function(showDate){
+		-	var returnDate = new Date(showDate).toLocaleString();
+		-	return returnDate;
+		- }
 		each show, i in showEntries
 			p
-				| Show date: #{show.date}
+				| Show date: #{dateFormatter(show.date)}
 				br
 				| Hidden: 
 				input(type='checkbox', name='acceptingTickets-#{show.date}', checked=show.acceptingTickets)

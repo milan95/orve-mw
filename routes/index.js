@@ -24,7 +24,7 @@ router.get('/showlist', function(req, res) {
 /* GET Ticket list page. */
 router.get('/ticketlist', function(req, res) {
   var db = req.db;
-  var collection = db.get('tickets');
+  var collection = db.get('venmoTickets');
   collection.find({},{},function(e,docs){
     res.render('ticketlist', {
         "ticketlist" : docs
@@ -32,13 +32,79 @@ router.get('/ticketlist', function(req, res) {
   });
 });
 
-router.get('/venmo_update', function(req, res) {
+
+/* POST from venmo webhooks */
+router.post('/venmo_update', function(req, res) {
   var db = req.db;
-  var collection = db.get('tickets');
+  var collection = db.get('venmoTickets');
+  var sellerCollection = db.get('shows');
 
-  var venmoChallenge = req.query.venmo_challenge;
+  var venmoResponse = JSON.parse(req);
 
-  res.render('venmo_update', { venmo_challenge : venmoChallenge });
+  res.render('venmo_update', { });
+
+  if(venmoResponse.type == "payment.updated") {
+
+    var showDate;
+    var ticketNumber;
+
+    collection.update(
+      { transID: venmoResponse.data.id },
+      {
+        $set: {
+          status: venmoResponse.data.status
+        }
+      },
+      {
+        upsert: false
+      }
+    );
+
+    collection.find({ transID: venmoResponse.data.id }, function(err, cursor) {
+      showDate = cursor[0].date;
+      ticketNumber = cursor[0].tixSold + 1;
+      sellerCollection.update(
+        { date: showDate },
+        {
+          $set: {
+            tixSold: ticketNumber
+          }
+        },
+        {
+          upsert: false
+        }
+      );
+    });
+
+  }
+  
+});
+
+/* POST to Charge Customer Service */
+router.post('/chargecustomer', function(req, res) {
+
+  // Set our internal DB variable
+  var db = req.db;
+  var sellerCollection = db.get('shows');
+
+  // Get our form values. These rely on the "name" attributes
+  var userFirstName = req.body.firstname;
+  var userLastName = req.body.lastname;
+  var userPhone = req.body.telephone;
+  var userAmt = req.body.amount;
+  var userShow = req.body.show;
+
+  var newAmt = "-" + userAmt;
+  var prettyShow = new Date(userShow).toLocaleString();
+  var message = "Mask and Wig " + prettyShow + " Show";
+  var formResponse = "Venmo Charge for " + userFirstName + " " + userLastName + " at phone number " + userPhone + " for show " + prettyShow + " for $" + userAmt + " was successful.";
+
+  // Set our collection
+  var collection = db.get('venmoTickets');
+
+  // Update the DB
+  
+
 });
 
 /* GET addshow page */
@@ -193,7 +259,7 @@ router.post('/chargecustomer', function(req, res) {
   });
 
   // Set our collection
-  var collection = db.get('tickets');
+  var collection = db.get('venmoTickets');
 
   //var TXN = PostChargeRequest(ACCESS_TOKEN, userPhone, newAmt, message);
 
@@ -238,6 +304,5 @@ function PostChargeRequest(accessToken, userPhone, amount, note) {
   form.append('amount', amount);
   form.append('note', note);
 }
-
 
 module.exports = router;

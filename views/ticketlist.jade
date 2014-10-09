@@ -4,11 +4,15 @@ block content
 	h1.
 		Ticket List
 	ul
+		- var dateFormatter = function(showDate){
+		-	var returnDate = new Date(showDate).toLocaleString();
+		-	return returnDate;
+		- }
 		each ticket, i in ticketlist
 			li
-				| #{ticket.firstname}  #{ticket.lastname}
+				| Name: #{ticket.firstname}  #{ticket.lastname}
 				br
-				| Show: #{ticket.showDate}
+				| Show: #{dateFormatter(ticket.showDate)}
 				br 
 				| Phone: #{ticket.phone} 
 				br
