@@ -10,13 +10,24 @@ router.get('/', function(req, res) {
   res.render('index', { title: 'Orve Home' });
 });
 
-/* GET Userlist page. */
+/* GET Show list page. */
 router.get('/showlist', function(req, res) {
     var db = req.db;
     var collection = db.get('shows');
     collection.find({},{},function(e,docs){
       res.render('showlist', {
           "showlist" : docs
+      });
+    });
+});
+
+/* GET Ticket list page. */
+router.get('/ticketlist', function(req, res) {
+    var db = req.db;
+    var collection = db.get('tickets');
+    collection.find({},{},function(e,docs){
+      res.render('ticketlist', {
+          "ticketlist" : docs
       });
     });
 });
@@ -59,7 +70,8 @@ router.get('/admin', function(req, res) {
     var collection = db.get('shows');
     collection.find({},{},function(e,docs){
         res.render('admin', {
-            "showEntries" : docs
+            "showEntries" : docs,
+            title: 'Administrator Control Panel'
         });
     });
     
@@ -72,7 +84,8 @@ router.get('/seller', function(req, res) {
 
     collection.find({},{},function(e,docs){
         res.render('seller', {
-            "showEntries" : docs
+            "showEntries" : docs,
+            title: 'Sell Tickets'
         });
     });
 });
@@ -116,29 +129,36 @@ router.post('/chargecustomer', function(req, res) {
 
     // Set our internal DB variable
     var db = req.db;
+    var sellerCollection = db.get('shows');
 
     // Get our form values. These rely on the "name" attributes
     var userFirstName = req.body.firstname;
     var userLastName = req.body.lastname;
-    var userName = userFirstName + userLastName;
     var userPhone = req.body.telephone;
     var userAmt = req.body.amount;
     var userShow = req.body.show;
 
     var newAmt = "-" + userAmt;
-    var message = "Mask%20and%20Wig%20" + userShow + "Show";
-    var formResponse = "Venmo Charge for " + userName + " at phone number " + userPhone + " for show " + userShow + " for $" + userAmt + " was successful.";
+    var prettyShow = new Date(userShow).toLocaleString();
+    var message = "Mask and Wig " + prettyShow + " Show";
+    var formResponse = "Venmo Charge for " + userFirstName + " " + userLastName + " at phone number " + userPhone + " for show " + prettyShow + " for $" + userAmt + " was successful.";
 
-    res.render('seller', { title: 'Ticketing Control Panel', formResult: formResponse });
+    sellerCollection.find({},{},function(e,docs){
+        res.render('seller', {
+            "showEntries" : docs,
+            formResult: formResponse
+        });
+    });
 
     // Set our collection
-    var collection = db.get('usercollection');
+    var collection = db.get('tickets');
 
     //var TXN = PostChargeRequest(ACCESS_TOKEN, userPhone, newAmt, message);
 
     // Submit to the DB
     collection.insert({
-        "name" : userName,
+        "firstname" : userFirstName,
+        "lastname": userLastName,
         "phone" : userPhone,
         "amount" : userAmt,
         //"transID" : TXN,
@@ -146,13 +166,25 @@ router.post('/chargecustomer', function(req, res) {
         "showDate" : userShow
     }, function (err, doc) {
         if (err) {
-            // If it failed, return error
-            //res.send("There was a problem processing the charge request.");
         }
         else {
-            // All worked. Do something?
         }
     });
+
+// FIX THIS STUFF!!!
+    var currentTickets = parseInt(sellerCollection.tixSold) + 1;
+
+    sellerCollection.update(
+      { date: userShow },
+      {
+        $set: {
+          tixSold: currentTickets
+        }
+      },
+      {
+        upsert: true
+      }
+    );
 
 });
 

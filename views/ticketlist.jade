@@ -1,0 +1,15 @@
+extends layout
+
+block content
+	h1.
+		Ticket List
+	ul
+		each ticket, i in ticketlist
+			li
+				| #{ticket.firstname}  #{ticket.lastname}
+				br
+				| Show: #{ticket.showDate}
+				br 
+				| Phone: #{ticket.phone} 
+				br
+				| Status: #{ticket.status}

@@ -2,7 +2,7 @@ extends layout
 
 block content
 	h1 Show Dates
-	h4 To allow sellers to sell tickets
+	h4 To allow sellers to sell tickets, uncheck the "Hidden" box.
 	p#responseMessage #{formResult}
 	form#formAdminPanel(name="updateshows",method="post",action="/updateshows")
 		each show, i in showEntries

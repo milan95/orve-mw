@@ -12,15 +12,19 @@ block content
 			option(value='10.00') $10
 			option(value='12.00') $12
 			option(value='15.00') $15
+		- var dateFormatter = function(showDate){
+		-	var returnDate = new Date(showDate).toLocaleString();
+		-	return returnDate;
+		- }
 		select#selectShow(name='show')
 			option(value='', disabled=true, selected=true) Select a show
 				each show, i in showEntries
-					option(value=show.date, disabled=show.acceptingTickets) #{show.date}
+					option(value=show.date, disabled=show.acceptingTickets) #{dateFormatter(show.date)}
 		button#btnSubmit(type="submit") Send Charge
 	h1 Cash Sales
 	form#formAddUser(name="chargecustomer",method="post",action="/chargecustomer")
 		select#selectShow(name='show')
 			option(value='', disabled=true, selected=true) Select a show
-			each show, i in showEntries
-					option(value=show.date, disabled=show.acceptingTickets) #{show.date}
+				each show, i in showEntries
+					option(value=show.date, disabled=show.acceptingTickets) #{dateFormatter(show.date)}
 		button#btnSubmit(type="submit") Cash Sale
